@@ -2,7 +2,6 @@ package server;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 import server.handler.aio.AIOEventHandler;

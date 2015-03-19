@@ -6,17 +6,20 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
+import java.util.List;
 
 import server.AIO;
 import server.HttpRequest;
 import server.HttpRequestBuilder;
 import server.HttpResponse;
+import server.MIME;
 import server.NioHttpServer;
 import server.Status;
-import server.handler.aio.DirectoryHandler;
-import server.handler.aio.StaticFileHandler;
+import server.handler.aio.AIOEventHandler;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
+import com.google.common.io.Files;
 
 public class ReadSocketHandler implements NIOEventHandler {
 	private SelectionKey socketChannelSelectionKey;
@@ -29,18 +32,92 @@ public class ReadSocketHandler implements NIOEventHandler {
 	}
 
 	
-	private void process(HttpRequest req, HttpResponse resp) throws FileNotFoundException {
+	private void process(final HttpRequest req, final HttpResponse resp) throws FileNotFoundException {
 	    if (isStaticResource(req)) {
 	        File file = new File(NioHttpServer.docRoot() + req.getPath());
 	        if (! file.exists()) {
 	            resp.setStatus(Status._404);
 	            resp.setProtocol(req.getProtocol());
+	            resp.setBody("<html><body>404 Not Found</body></html>".getBytes(Charsets.UTF_8));
 	            resp.send();
 	            return;
 	        } else if (file.isDirectory()) {
-	            AIO.readDirectory(file, new DirectoryHandler(req, resp));
+	            AIO.readDirectory(file, new AIOEventHandler<List<File>>() {
+
+	                private List<File> children;
+	                
+	                @Override
+	                public void handle() throws IOException {
+	                    resp.setStatus(Status._200);
+	                    resp.setProtocol(req.getProtocol());
+	                    resp.addHeader("Content-Type", "text/html");
+	                    resp.addHeader("Pragma", "no-cache");
+	                    resp.addHeader("Cache-Control", "no-store");
+	                    String body = generateHtml();
+	                    resp.setBody(body.getBytes(Charsets.UTF_8));
+	                    resp.send();
+	                }
+	                
+	                private String getRelativePath(File file, File folder) {
+	                    String filePath = file.getAbsolutePath();
+	                    String folderPath = folder.getAbsolutePath();
+	                    if (filePath.startsWith(folderPath)) {
+	                        return filePath.substring(folderPath.length());
+	                    } else {
+	                        return null;
+	                    }
+	                }
+
+	                private String generateHtml() {
+	                    StringBuilder sb = new StringBuilder();
+	                    sb.append("<html><body>");
+	                    for (File child : children) {
+	                        String relativePath = getRelativePath(child, new File(NioHttpServer.docRoot()));
+	                        String text = child.getName();
+	                        if (child.isDirectory()) {
+	                            text = "+ " + text;
+	                        } else {
+	                            text = "- " + text;
+	                        }
+	                        String link = "<p><a href=\"" + relativePath + "\">" + text + "</a></p>\n";
+	                        sb.append(link);
+	                    }
+	                    sb.append("</body></html>");
+	                    return sb.toString();
+	                }
+
+	                @Override
+	                public void setEvent(List<File> event) {
+	                    this.children = event;
+	                }
+                });
 	        } else {
-	            AIO.readFile(file, new StaticFileHandler(req, resp));
+	            AIO.readFile(file, new AIOEventHandler<byte[]>() {
+                    private byte[] content;
+                    
+                    @Override
+                    public void setEvent(byte[] event) {
+                        this.content = event;
+                    }
+                    
+                    @Override
+                    public void handle() throws IOException {
+                        String path = req.getPath();
+                        String extension = Files.getFileExtension(path);
+
+                        String mime = MIME.getContentType(extension);
+                        
+                        resp.setStatus(Status._200);
+                        resp.setProtocol(req.getProtocol());
+                        if (! Strings.isNullOrEmpty(mime)) {
+                            resp.addHeader("Content-Type", mime);
+                        }
+                        resp.addHeader("Pragma", "no-cache");
+                        resp.addHeader("Cache-Control", "no-store");
+                        resp.setBody(content);
+                        resp.send();
+                    }
+                });
 	        }
 	    }
 	    else {
