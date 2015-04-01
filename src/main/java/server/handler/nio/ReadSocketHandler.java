@@ -24,7 +24,7 @@ import com.google.common.io.Files;
 public class ReadSocketHandler implements NIOEventHandler {
 	private SelectionKey socketChannelSelectionKey;
 	private HttpRequestBuilder builder;
-	private ByteBuffer input = ByteBuffer.allocate(64);
+	private ByteBuffer input = ByteBuffer.allocate(1024);
 
 	public ReadSocketHandler(SelectionKey sk) throws IOException {
 		this.socketChannelSelectionKey = sk;
