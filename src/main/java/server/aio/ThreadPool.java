@@ -17,10 +17,8 @@ public class ThreadPool {
     
     public void assignTask(Task task) {
         synchronized (tasks) {
-        	if (tasks.size() == 0) {
-        	    tasks.add(task);
-        		tasks.notifyAll();
-        	}
+            tasks.add(task);
+        	tasks.notify();
         }
     }
     
