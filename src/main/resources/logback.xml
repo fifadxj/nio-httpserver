@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration scan="true" scanPeriod="30 seconds">
+
+	<property name="log.dir" value="${root}/logs/" />
+	<property name="log.level" value="debug" />
+
+    <appender name="systemOutAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%c{0}] -%m%n</pattern>
+        </encoder>
+    </appender>
+    
+	<appender name="dailyAppender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${log.dir}/daily.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log.dir}/daily.log.%d{yyyy-MM-dd}.gz</fileNamePattern>
+		</rollingPolicy>
+		<encoder>
+			<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%c{0}] -%m%n</Pattern>
+		</encoder>
+	</appender>
+
+	<root level="${log.level}">
+		<appender-ref ref="dailyAppender" />
+		<appender-ref ref="systemOutAppender" />
+	</root>
+
+<!-- 	<logger name="daily" additivity="false" level="${log.level}">
+		<appender-ref ref="dailyAppender" />
+	</logger> -->
+	
+
+</configuration>

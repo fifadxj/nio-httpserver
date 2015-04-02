@@ -3,7 +3,13 @@ package server.aio;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import server.NioHttpServer;
+
 public class ThreadPool {
+    private static Logger logger = LoggerFactory.getLogger(ThreadPool.class);
     private static final int POOL_SIZE = 100;
 
     private List<Task> tasks = new ArrayList<Task>();
@@ -28,8 +34,7 @@ public class ThreadPool {
                 try {
                 	tasks.wait();
                 } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    logger.error("thread interrupted when fetchTask", e);
                 }
             }
             Task task = tasks.remove(0);
@@ -51,8 +56,7 @@ public class ThreadPool {
                 try {
                 	task.execute(id);
     			} catch (Throwable e) {
-    				// TODO Auto-generated catch block
-    				e.printStackTrace();
+    			    logger.error("thread interrupted when fetchTask", e);
     			}
             }
         }
