@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import server.handler.aio.AIOEventHandler;
 import server.handler.nio.AcceptSocketConnectionHandler;
@@ -81,7 +82,7 @@ public class NioHttpServer {
 
 	public void eventLoop() throws IOException {
 		while (!Thread.interrupted()) {
-			selector.select(100);
+			selector.select(10);
 			Set<SelectionKey> selected = selector.selectedKeys();
 			Iterator<SelectionKey> it = selected.iterator();
 			while (it.hasNext()) {
