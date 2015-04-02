@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import server.HttpResponse;
 
 public class WriteSocketHandler implements NIOEventHandler {
@@ -22,7 +25,12 @@ public class WriteSocketHandler implements NIOEventHandler {
 	@Override
     public void handle() throws IOException {
 		//System.out.println("write...");
-		resp.getSocket().write(output);
+	    try {
+	        resp.getSocket().write(output);
+	    }catch (IOException e) {
+	        resp.getSocket().close();
+	        throw e;
+	    }
 		if (outputIsComplete()) {
 		    resp.getSocket().close();
 		    //resp.getSelectionKey().cancel();
