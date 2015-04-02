@@ -31,12 +31,17 @@ public class HttpRequestBuilder {
     private Map<String, String> params = new LinkedHashMap<String, String>();
     private Map<String, String> cookies = new LinkedHashMap<String, String>();
     
+    private boolean ignoreRest = false;
+    
     public HttpRequestBuilder(SelectionKey sk) {
         this.socketChannelSelectionKey = sk;
     }
     
+    public boolean ignoreRest() {
+        return this.ignoreRest;
+    }
+    
     public boolean isInputComplete() {
-        
         if (inputString.indexOf("\r\n\r\n") != -1) {//request header is end
             String startLineAndHeader = inputString.substring(0, inputString.indexOf("\r\n\r\n"));
             List<String> lines = Splitter.on("\r\n").trimResults().splitToList(startLineAndHeader);
@@ -48,12 +53,14 @@ public class HttpRequestBuilder {
             }
 
             if (! method.hasBody()) {
+                this.ignoreRest = true;
                 return true;
             }
             else {
                 String body = inputString.substring(inputString.indexOf("\r\n\r\n") + 4);
                 if (body.length() >= contentLength) {
                     this.body = body;
+                    this.ignoreRest = true;
                     return true;
                 }
                 else {

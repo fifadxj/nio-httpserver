@@ -8,6 +8,9 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import server.HttpRequest;
 import server.HttpRequestBuilder;
 import server.HttpResponse;
@@ -135,7 +138,11 @@ public class ReadSocketHandler implements NIOEventHandler {
     public void handle() throws IOException {
 		input.clear();
 		SocketChannel socket = (SocketChannel)socketChannelSelectionKey.channel();
-		socket.read(input);
+		int n = socket.read(input);
+		if (n == -1) {
+		    socket.close();
+		    return;
+		}
 		
 		input.flip();
 		byte[] segmentBytes = new byte[input.limit()];
@@ -147,7 +154,7 @@ public class ReadSocketHandler implements NIOEventHandler {
 		//System.out.println("-----");
 		
 		
-		if (builder.isInputComplete()) {
+		if (! builder.ignoreRest() && builder.isInputComplete()) {
 		    HttpRequest req = builder.build();
 
 			HttpResponse resp = new HttpResponse();
