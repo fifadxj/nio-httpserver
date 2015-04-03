@@ -37,7 +37,7 @@ public class HttpRequestBuilder {
         this.socketChannelSelectionKey = sk;
     }
     
-    public boolean ignoreRest() {
+    public boolean ignoreRestInput() {
         return this.ignoreRest;
     }
     

@@ -139,7 +139,8 @@ public class ReadSocketHandler implements NIOEventHandler {
 		input.clear();
 		SocketChannel socket = (SocketChannel)socketChannelSelectionKey.channel();
 		int n = socket.read(input);
-		if (n == -1) {
+		
+		if (n == -1) {// if EOS is reached, then close the socket
 		    socket.close();
 		    return;
 		}
@@ -154,7 +155,7 @@ public class ReadSocketHandler implements NIOEventHandler {
 		//System.out.println("-----");
 		
 		
-		if (! builder.ignoreRest() && builder.isInputComplete()) {
+		if (! builder.ignoreRestInput()/*every socket only accept one request*/ && builder.isInputComplete()) {
 		    HttpRequest req = builder.build();
 
 			HttpResponse resp = new HttpResponse();
