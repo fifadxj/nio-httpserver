@@ -17,7 +17,7 @@ public class AIO {
         pool.start();
     }
 
-    public static void readFile(final File file, final AIOEventHandler<byte[]> handler) {
+    public static void readFile(final File file, final AIOEventHandler handler) {
         pool.assignTask(new Task() {
 
             @Override
@@ -35,7 +35,7 @@ public class AIO {
         });
     }
     
-    public static void readDirectory(final File file, final AIOEventHandler<List<File>> handler) {
+    public static void readDirectory(final File file, final AIOEventHandler handler) {
         pool.assignTask(new Task() {
 
             @Override

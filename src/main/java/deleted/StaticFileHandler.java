@@ -11,7 +11,7 @@ import server.handler.aio.AIOEventHandler;
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
 
-public class StaticFileHandler implements AIOEventHandler<byte[]> {
+public class StaticFileHandler implements AIOEventHandler {
 
     private HttpRequest req;
     private HttpResponse resp;
@@ -45,8 +45,8 @@ public class StaticFileHandler implements AIOEventHandler<byte[]> {
 	}
 
 	@Override
-	public void setEvent(byte[] content) {
-		this.content = content;
+	public void setEvent(Object content) {
+		this.content = (byte[]) content;
 		//System.out.println(content.length);
 		//System.out.println(Integer.MAX_VALUE + " " + Integer.MIN_VALUE);
 	}

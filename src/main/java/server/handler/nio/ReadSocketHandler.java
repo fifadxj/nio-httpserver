@@ -45,7 +45,7 @@ public class ReadSocketHandler implements NIOEventHandler {
 	            resp.send();
 	            return;
 	        } else if (file.isDirectory()) {
-	            AIO.readDirectory(file, new AIOEventHandler<List<File>>() {
+	            AIO.readDirectory(file, new AIOEventHandler() {
 
 	                private List<File> children;
 	                
@@ -90,17 +90,17 @@ public class ReadSocketHandler implements NIOEventHandler {
 	                }
 
 	                @Override
-	                public void setEvent(List<File> event) {
-	                    this.children = event;
+	                public void setEvent(Object event) {
+	                    this.children = (List<File>) event;
 	                }
                 });
 	        } else {
-	            AIO.readFile(file, new AIOEventHandler<byte[]>() {
+	            AIO.readFile(file, new AIOEventHandler() {
                     private byte[] content;
                     
                     @Override
-                    public void setEvent(byte[] event) {
-                        this.content = event;
+                    public void setEvent(Object event) {
+                        this.content = (byte[]) event;
                     }
                     
                     @Override

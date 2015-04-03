@@ -12,7 +12,7 @@ import server.handler.aio.AIOEventHandler;
 
 import com.google.common.base.Charsets;
 
-public class DirectoryHandler implements AIOEventHandler<List<File>> {
+public class DirectoryHandler implements AIOEventHandler {
     private HttpRequest req;
     private HttpResponse resp;
     private List<File> children;
@@ -64,8 +64,8 @@ public class DirectoryHandler implements AIOEventHandler<List<File>> {
     }
 
     @Override
-    public void setEvent(List<File> event) {
-        this.children = event;
+    public void setEvent(Object event) {
+        this.children = (List<File>)event;
     }
 
 }

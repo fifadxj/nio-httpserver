@@ -2,7 +2,7 @@ package server.handler.aio;
 
 import java.io.IOException;
 
-public interface AIOEventHandler<T> {
+public interface AIOEventHandler {
     void handle() throws IOException;
-	void setEvent(T event);
+	void setEvent(Object event);
 }
