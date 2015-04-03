@@ -3,13 +3,16 @@ package server.handler.nio;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.List;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import server.HttpRequest;
 import server.HttpRequestBuilder;
@@ -25,11 +28,16 @@ import com.google.common.base.Strings;
 import com.google.common.io.Files;
 
 public class ReadSocketHandler implements NIOEventHandler {
+    private static Logger logger = LoggerFactory.getLogger(ReadSocketHandler.class);
+    private static Logger accessLogger = LoggerFactory.getLogger("accessLog");
+    
 	private SelectionKey socketChannelSelectionKey;
 	private HttpRequestBuilder builder;
 	private ByteBuffer input = ByteBuffer.allocate(1024);
+	private String id;
 
 	public ReadSocketHandler(SelectionKey sk) throws IOException {
+	    this.id = UUID.randomUUID().toString();
 		this.socketChannelSelectionKey = sk;
 		this.builder  = new HttpRequestBuilder(sk);
 	}
@@ -149,14 +157,19 @@ public class ReadSocketHandler implements NIOEventHandler {
 		byte[] segmentBytes = new byte[input.limit()];
 		input.get(segmentBytes);
 		
+		if (logger.isDebugEnabled()) {
+    		String text = new String(segmentBytes, Charsets.UTF_8);
+    		logger.debug("[" + id + "] received request segment: " + text);
+		}
 		builder.appendSegment(segmentBytes);
-		//System.out.println("-----");
-		//System.out.println(segment);
-		//System.out.println("-----");
 		
 		
 		if (! builder.ignoreRestInput()/*every socket only accept one request*/ && builder.isInputComplete()) {
 		    HttpRequest req = builder.build();
+		    if (accessLogger.isInfoEnabled()) {
+		        InetSocketAddress address = (InetSocketAddress) socket.getRemoteAddress();
+		        accessLogger.info("[" + req.id() + "] " + address.getAddress().getHostAddress() + " " + req.getMethod() + " " + req.getPath());
+		    }
 
 			HttpResponse resp = new HttpResponse();
 			resp.setSelectionKey(socketChannelSelectionKey);

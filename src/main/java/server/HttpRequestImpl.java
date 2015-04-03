@@ -5,6 +5,7 @@ import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import com.google.common.base.Preconditions;
 
@@ -22,8 +23,10 @@ public class HttpRequestImpl implements HttpRequest {
     private String protocol;
     private String raw;
     private SelectionKey sk;
+    private String id;
     
     public HttpRequestImpl() {
+        this.id = UUID.randomUUID().toString();
     }
     
     @Override
@@ -169,5 +172,9 @@ public class HttpRequestImpl implements HttpRequest {
     @Override
     public SelectionKey getSelectionKey() {
         return sk;
+    }
+    
+    public String id() {
+        return this.id;
     }
 }

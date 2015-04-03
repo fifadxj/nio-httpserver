@@ -39,5 +39,7 @@ public interface HttpRequest {
     SocketChannel getSocket();
     
     SelectionKey getSelectionKey();
+    
+    String id();
 
 }
