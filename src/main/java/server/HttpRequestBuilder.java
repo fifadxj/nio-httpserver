@@ -1,7 +1,6 @@
 package server;
 
 import java.nio.channels.SelectionKey;
-import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;

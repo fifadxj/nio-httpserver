@@ -41,11 +41,6 @@ public class NioHttpServer {
 	public static void main(String[] args) throws IOException {
 		NioHttpServer server = new NioHttpServer(8888);
 		server.eventLoop();
-		
-//		File file = new File("/Users/Terry/nio-root/");
-//		System.out.println(file.exists() + " " + file.getAbsolutePath());
-//		file = new File("/Users/Terry/nio-root");
-//        System.out.println(file.exists() + " " + file.getAbsolutePath());
 	}
 
 	public static void addHandler(AIOEventHandler handler) throws IOException {
@@ -53,14 +48,6 @@ public class NioHttpServer {
 			handlers.add(handler);
 		}
 	}
-
-//	private synchronized static Selector getSelector() throws IOException {
-//		if (selector == null) {
-//			selector = Selector.open();
-//		}
-//
-//		return selector;
-//	}
 
 	public NioHttpServer(int port) throws IOException {
 		serverSocketChannel = ServerSocketChannel.open();

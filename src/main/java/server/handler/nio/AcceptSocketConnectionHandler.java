@@ -2,11 +2,8 @@ package server.handler.nio;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-
-import server.NioHttpServer;
 
 public class AcceptSocketConnectionHandler implements NIOEventHandler {
 	private SelectionKey serverSocketSelectionKey;
@@ -18,6 +15,7 @@ public class AcceptSocketConnectionHandler implements NIOEventHandler {
 	public void handle() throws IOException {
 	    ServerSocketChannel serverSocket = (ServerSocketChannel) serverSocketSelectionKey.channel();
 		SocketChannel socket = serverSocket.accept();
+		
 		if (socket != null) {
 			socket.configureBlocking(false);
 			SelectionKey socketSk = socket.register(serverSocketSelectionKey.selector(), SelectionKey.OP_READ);

@@ -23,9 +23,7 @@ public class AIO {
             @Override
             public void execute(int threadId) {
                 try {
-                    // System.out.println("reading start...");
                     byte[] bytes = Files.toByteArray(file);
-                    // System.out.println("reading finished...");
                     handler.setEvent(bytes);
                     NioHttpServer.addHandler(handler);
                 } catch (IOException e) {
@@ -55,9 +53,7 @@ public class AIO {
         Runnable runnable = new Runnable() {
             public void run() {
                 try {
-                    //System.out.println("reading start...");
                     byte[] bytes = Files.toByteArray(file);
-                    //System.out.println("reading finished...");
                     handler.setEvent(bytes);
                     NioHttpServer.addHandler(handler);
                 } catch (IOException e) {
