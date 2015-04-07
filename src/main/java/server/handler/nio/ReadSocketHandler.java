@@ -1,9 +1,9 @@
 package server.handler.nio;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
@@ -42,9 +42,10 @@ public class ReadSocketHandler implements NIOEventHandler {
 	}
 
 	
-	private void process(final HttpRequest req, final HttpResponse resp) throws FileNotFoundException {
+	private void process(final HttpRequest req, final HttpResponse resp) throws IOException {
 	    if (isStaticResource(req)) {
-	        File file = new File(NioHttpServer.docRoot() + req.getPath());
+	        String filename = URLDecoder.decode(req.getPath(), Charsets.UTF_8.name());
+	        File file = new File(NioHttpServer.docRoot() + filename);
 	        if (! file.exists()) {
 	            resp.setStatus(Status._404);
 	            resp.setProtocol(req.getProtocol());
@@ -60,7 +61,7 @@ public class ReadSocketHandler implements NIOEventHandler {
 	                public void handle() throws IOException {
 	                    resp.setStatus(Status._200);
 	                    resp.setProtocol(req.getProtocol());
-	                    resp.addHeader("Content-Type", "text/html");
+	                    resp.addHeader("Content-Type", "text/html;charset=UTF-8");
 	                    resp.addHeader("Pragma", "no-cache");
 	                    resp.addHeader("Cache-Control", "no-store");
 	                    String body = generateHtml();
@@ -166,7 +167,7 @@ public class ReadSocketHandler implements NIOEventHandler {
 		if (! builder.ignoreRestInput()/*every socket only accept one request*/ && builder.isInputComplete()) {
 		    HttpRequest req = builder.build();
 		    if (accessLogger.isInfoEnabled()) {
-		        InetSocketAddress address = (InetSocketAddress) socket.getRemoteAddress();
+		        InetSocketAddress address = (InetSocketAddress) socket.socket().getRemoteSocketAddress();
 		        accessLogger.info("[" + req.id() + "] " + address.getAddress().getHostAddress() + " " + req.getMethod() + " " + req.getPath());
 		    }
 
