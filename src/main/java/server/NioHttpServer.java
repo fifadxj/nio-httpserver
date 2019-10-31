@@ -68,7 +68,7 @@ public class NioHttpServer {
 
 	public void eventLoop() throws IOException {
 		while (!Thread.interrupted()) {
-			selector.select(100);
+			selector.select();
 			Set<SelectionKey> selected = selector.selectedKeys();
 			Iterator<SelectionKey> it = selected.iterator();
 			while (it.hasNext()) {

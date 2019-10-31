@@ -1,6 +1,11 @@
-/target/
-.DS-Store
+build/
+target/
+.gradle
+*.iml
+.idea/
 
-.project
+#Eclipse-specific
+.settings/
 .classpath
-.settings
+.project
+bin/

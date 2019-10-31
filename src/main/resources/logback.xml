@@ -3,7 +3,7 @@
 <configuration scan="true" scanPeriod="30 seconds">
 
 	<property name="log.dir" value="${root}/logs/" />
-	<property name="log.level" value="info" />
+	<property name="log.level" value="debug" />
 
     <appender name="systemOutAppender" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>

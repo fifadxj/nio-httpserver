@@ -2,6 +2,7 @@ package server.handler.nio;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.SelectionKey;
 
 import server.HttpResponse;
 
@@ -27,8 +28,9 @@ public class WriteSocketHandler implements NIOEventHandler {
 	        throw e;
 	    }
 		if (outputIsComplete()) {
-		    resp.getSocket().close();
-		    //resp.getSelectionKey().cancel();
+			 //resp.getSocket().close();
+			resp.getSelectionKey().interestOps(SelectionKey.OP_READ);
+			resp.getSelectionKey().attach(new ReadSocketHandler(resp.getSelectionKey()));
 		}
     }
 }
